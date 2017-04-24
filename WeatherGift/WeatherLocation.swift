@@ -10,7 +10,7 @@ import Foundation
 import Alamofire
 import SwiftyJSON
 
-class WeatherLocation {
+class WeatherLocation: WeatherUserDefault {
     
     struct DailyForecast {
         var dailyMaxTemp: Double
@@ -20,14 +20,21 @@ class WeatherLocation {
         var dailyIcon: String
     }
     
-    var name = ""
-    var coordinates = ""
+    struct HourlyForecast {
+        var hourlyTime: Double
+        var hourlyIcon: String
+        var hourlyTemp: Double
+        var hourlyPrecipProb: Double
+    }
+    
+    
     var currentTemp = -999.9
     var dailySummary = ""
     var currentIcon = ""
     var currentTime = 0.0
     var timeZone = ""
     var dailyForecastArray = [DailyForecast]()
+    var hourlyForecastArray = [HourlyForecast]()
     //class wide scope
     
     func getWeather(completed: @escaping() ->()) {
@@ -81,6 +88,18 @@ class WeatherLocation {
                     let iconName = icon.replacingOccurrences(of: "night", with: "day")
                     self.dailyForecastArray.append(DailyForecast(dailyMaxTemp: maxTemp, dailyMinTemp: minTemp, dailySummary: dailySummary, dailyDate: dateValue, dailyIcon: icon))
                     print("dailyforecastarray = ****\(self.dailyForecastArray)")
+                }
+                
+                
+                let hourlyDataArray = json["hourly"]["data"]
+                self.hourlyForecastArray = []
+                let lastHour = min(hourlyDataArray.count-1, 24)
+                for hour in 1...lastHour {
+                    let hourlyTime = json["hourly"]["data"][hour]["time"].doubleValue
+                    let hourlyIcon = json["hourly"]["data"][hour]["icon"].stringValue
+                    let hourlyTemp = json["hourly"]["data"][hour]["temperature"].doubleValue
+                    let hourlyPrecipProb = json["hourly"]["data"][hour]["precipProbability"].doubleValue
+                    self.hourlyForecastArray.append(HourlyForecast(hourlyTime: hourlyTime, hourlyIcon: hourlyIcon, hourlyTemp: hourlyTemp, hourlyPrecipProb: hourlyPrecipProb))
                 }
             case .failure(let error):
                 print(error)
