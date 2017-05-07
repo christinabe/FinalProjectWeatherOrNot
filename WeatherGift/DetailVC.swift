@@ -18,6 +18,11 @@ class DetailVC: UIViewController {
     @IBOutlet weak var currentImage: UIImageView!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var collectionView: UICollectionView!
+   
+    @IBOutlet weak var shoeLabel: UIButton!
+    @IBOutlet weak var shirtLabel: UIButton!
+    @IBOutlet weak var pantsLabel: UIButton!
+    @IBOutlet weak var accessoriesLabel: UIButton!
     
     var currentPage = 0
     var locationsArray = [WeatherLocation] ()
@@ -31,12 +36,14 @@ class DetailVC: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         locationManager.delegate = self
-        
+        shoeLabel.setImage(UIImage(named: "shoe"), for: .normal)
+        shirtLabel.setImage(UIImage(named: "shirt"), for: .normal)
+        pantsLabel.setImage(UIImage(named: "jean"), for: .normal)
+        accessoriesLabel.setImage(UIImage(named: "sunglasses"), for: .normal)
        
         locationsArray[currentPage].getWeather {
             self.updateUserInterface()
         }
-        //updateUserInterface()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -80,6 +87,16 @@ class DetailVC: UIViewController {
         let dateString = dateFormatter.string(from: usableDate)
         return dateString
     }
+    
+    func showAlert(title: String, message: String) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        
+        let alertAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+        
+        alertController.addAction(alertAction)
+        
+        present(alertController, animated: true, completion: nil)
+    }
 }
 
 
@@ -106,14 +123,14 @@ extension DetailVC: CLLocationManagerDelegate{
         }
     }
     
-    func showAlert(title: String, message: String) {
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        
-        let defaultAction = UIAlertAction(title: "OK", style: .default, handler: nil)
-        alertController.addAction(defaultAction)
-        
-        present(alertController, animated: true, completion: nil)
-    }
+//    func showAlert(title: String, message: String) {
+//        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+//        
+//        let defaultAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+//        alertController.addAction(defaultAction)
+//        
+//        present(alertController, animated: true, completion: nil)
+//    }
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         handleLocationAuthorizationStatus(status: status)
@@ -183,4 +200,52 @@ extension DetailVC: UICollectionViewDelegate, UICollectionViewDataSource {
         hourlyCell.configureCollectionCell(hourlyForecast: self.locationsArray[currentPage].hourlyForecastArray[indexPath.row], timeZone: self.locationsArray[currentPage].timeZone)
         return hourlyCell
     }
+    
+    
 }
+
+//extension DetailVC {
+//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+//        
+//        if segue.identifier == "ToBottom" {
+//            
+//            let bottomsVC = segue.destination as! BottomsVC
+//            bottomsVC.temperature = temperatureLabel.text!
+//            
+//        }
+//    }
+//}
+
+
+
+extension DetailVC {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        if segue.identifier == "toShoes" {
+
+           let shoesVC = segue.destination as! ShoesVC
+            shoesVC.temperature = locationsArray[currentPage].currentTemp
+
+        } else if segue.identifier == "toAccessories" {
+            
+            let actualAccessoriesVC = segue.destination as! ActualAccessoriesVC
+            actualAccessoriesVC.temperature =  locationsArray[currentPage].currentTemp
+                //.hourlyForecastArray[2].hourlyPrecipProb
+            
+        } else if segue.identifier == "toBottoms" {
+            
+            let bottomsVC = segue.destination as! BottomsVC
+            bottomsVC.temperature = locationsArray[currentPage].currentTemp
+    
+        } else if segue.identifier == "toTops" {
+            
+            let topsVC = segue.destination as! TopsVC
+            topsVC.temperature = locationsArray[currentPage].currentTemp
+        
+        }
+    }
+}
+
+
+
+

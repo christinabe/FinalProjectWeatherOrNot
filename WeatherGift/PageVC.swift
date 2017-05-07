@@ -83,7 +83,7 @@ class PageVC: UIPageViewController {
         
         view.addSubview(listButton)
         
-        let aboutButtonText = "About..."
+        let aboutButtonText = "About creator"
         let aboutButtonFont = UIFont.systemFont(ofSize: 15)
         let fontAttributes = [NSFontAttributeName: aboutButtonFont]
         aboutButtonSize = aboutButtonText.size(attributes: fontAttributes)
